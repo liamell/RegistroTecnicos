@@ -8,13 +8,16 @@
 <PageTitle>Create</PageTitle>
 <EditForm Model="Tecnico" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
+
     @*Formulario*@
     <div class="container">
-        <div class="shadow-lg">
+        <div class="card shadow-lg">
+
             @*Header*@
             <div class="card-header text-center">
                 <h3><strong>Crear T&eacute;cnico</strong></h3>
             </div>
+
             @*Body*@
             <div class="card-body">
                 <div class="row">
@@ -23,12 +26,14 @@
                         <label class="form-label"><strong>T&eacute;cnicoId</strong></label>
                         <InputNumber class="form-control" @bind-Value="Tecnico.TecnicoId" readonly></InputNumber>
                     </div>
+
                     @*Nombre*@
                     <div class="col-3 ms-5">
                         <label class="form-label"><strong>Nombre</strong></label>
                         <InputText class="form-control" @bind-Value="Tecnico.Nombres"></InputText>
                         <ValidationMessage For="(()=> Tecnico.Nombres)" />
                     </div>
+
                     @*Sueldo*@
                     <div class="col-3 ms-5">
                         <label class="form-label"><strong>SueldoHora</strong></label>
@@ -38,6 +43,8 @@
 
                 </div>
             </div>
+
+
             @*Footer*@
             <div class="card-footer text-center">
                 <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
@@ -45,6 +52,8 @@
             </div>
         </div>
     </div>
+
+
 </EditForm>
 
 

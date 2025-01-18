@@ -9,9 +9,11 @@
 <PageTitle>Modificar &eacute;cnicoS</PageTitle>
 <EditForm Model="Tecnico" OnValidSubmit="Modificar">
 	<DataAnnotationsValidator />
+
 	@*Formulario*@
 	<div class="container">
-		<div class="shadow-lg">
+		<div class="card shadow-lg">
+
 			@*Header*@
 			<div class="card-header text-center">
 				<h3><strong>Editar T&eacute;cnico</strong></h3>
@@ -44,16 +46,14 @@
 
 					</div>
 
-
-
-				</div>
-				@*footer*@
-				<div class="card-footer text-center">
-					<button Type="button" Class="btn btn-primary" @onclick="Volver">Volver</button>
-					<button Type="submit" Class="btn btn-success">Modificar</button>
 				</div>
 
+			</div>
 
+			@*footer*@
+			<div class="card-footer text-center">
+				<button Type="button" Class="btn btn-primary" @onclick="Volver">Volver</button>
+				<button Type="submit" Class="btn btn-success">Modificar</button>
 			</div>
 
 
