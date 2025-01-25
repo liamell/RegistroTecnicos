@@ -1,0 +1,125 @@
+﻿@page "/Cliente/Create"
+@using RegistroTecnicos.Models
+@using RegistroTecnicos.Services
+@inject TecnicosService tecnicosService
+@inject ClientesService clientesService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer 
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Cliente</h5>
+            </div>
+
+            <div class="card-body">
+                @* CobroId *@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>ClienteId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Cliente.ClienteId" readonly></InputNumber>
+                </div>
+
+                @* Fecha *@
+                <div class="col-6 ms-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Cliente.FechaIngreso"></InputDate>
+                </div>
+
+                @*Nombre*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Nombre</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
+                    <ValidationMessage For="(()=> Cliente.Nombres)" />
+                </div>
+
+                @*Direccion*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Direccion</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Direccion"></InputText>
+                    <ValidationMessage For="@(() => Cliente.Direccion)" />
+                </div>
+
+                @*RNC*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>RNC</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.RNC"></InputText>
+                    <ValidationMessage For="@(() => Cliente.RNC)" />
+                </div>
+
+                @* LimiteCredito *@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>LimiteCredito</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Cliente.LimiteCredito"></InputNumber>
+                </div>
+
+                @*TecnicoId*@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>TecnicoId</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Cliente.TecnicoId">
+                        <option value="" selected disabled>Elija una opción</option>
+                        @foreach (var tecnico in ListaTecnicos)
+                        {
+                            <option value="@tecnico.TecnicoId">@($"{tecnico.TecnicoId} - {tecnico.Nombres}")</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Cliente.TecnicoId)" />
+                    <p>Deudor seleccionado: @Cliente.TecnicoId</p>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+        
+    </div>
+</EditForm>
+
+@Mensaje
+
+@code {
+    public Clientes Cliente { get; set; } = new Clientes();
+    public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+        
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            Mensaje = "Ya existe un Cliente con este nombre";
+            return;
+        }
+
+        var crear = await clientesService.Guardar(Cliente);
+
+        if (crear)
+            Mensaje = "Se ha creado correctamente el Cliente";
+        else
+            Mensaje = "No se ha creado correctamente";
+
+    }
+
+    private async Task<bool> Validar()
+    {
+        var existe = await clientesService.ExisteCliente(Cliente.ClienteId, Cliente.Nombres);
+        return existe;
+    }
+
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/Cliente/Index");
+    }
+
+}
