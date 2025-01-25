@@ -32,6 +32,13 @@ public class ClientesService(IDbContextFactory<Contexto> DbFactory)
             && c.Nombres.ToLower().Equals(nombre.ToLower()));
     }
 
+    public async Task<bool> ExisteClientePorRNC(int clienteId, string rnc)
+    {
+        await using var contexto = await DbFactory.CreateDbContextAsync();
+        return await contexto.Clientes
+            .AnyAsync(c => c.RNC == rnc && c.ClienteId != clienteId);
+    }
+
     private async Task<bool> Insertar(Clientes cliente)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
