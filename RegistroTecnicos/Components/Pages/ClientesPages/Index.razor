@@ -2,6 +2,7 @@
 @using RegistroTecnicos.Models
 @using RegistroTecnicos.Services
 @inject ClientesService clientesService
+@inject TecnicosService tecnicosService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
 
@@ -81,7 +82,7 @@
                             <td>@cliente.Direccion</td>
                             <td>@cliente.RNC</td>
                             <td>@cliente.LimiteCredito</td>
-                            <td>@cliente.TecnicoId</td>
+                            <td>@GetTecnicoNombre(cliente.TecnicoId)</td>
                             
 
                             @*Pantalla Editar*@
@@ -112,12 +113,21 @@
 
 @code {
     public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+    public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         ListaClientes = await clientesService.Listar(c => c.ClienteId > 0);
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+    }
+
+
+    private string GetTecnicoNombre(int tecnicoId)
+    {
+        var tecnico = ListaTecnicos.FirstOrDefault(t => t.TecnicoId == tecnicoId);
+        return tecnico != null ? tecnico.Nombres : "Desconocido"; 
     }
 
     private async Task Buscar()
