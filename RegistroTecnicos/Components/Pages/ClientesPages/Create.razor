@@ -96,9 +96,8 @@
 
     public async Task Guardar()
     {
-        if (await Validar())
+        if (!await Validar())
         {
-            Mensaje = "Ya existe un Cliente con este nombre";
             return;
         }
 
@@ -108,15 +107,28 @@
             Mensaje = "Se ha creado correctamente el Cliente";
         else
             Mensaje = "No se ha creado correctamente";
-
     }
 
     private async Task<bool> Validar()
     {
-        var existe = await clientesService.ExisteCliente(Cliente.ClienteId, Cliente.Nombres);
-        return existe;
-    }
+        
+        var existeNombre = await clientesService.ExisteCliente(Cliente.ClienteId, Cliente.Nombres);
+        if (existeNombre)
+        {
+            Mensaje = "Ya existe un Cliente con este nombre";
+            return false;
+        }
 
+        
+        var existeRNC = await clientesService.ExisteClientePorRNC(Cliente.ClienteId, Cliente.RNC);
+        if (existeRNC)
+        {
+            Mensaje = "Ya existe un Cliente con este RNC";
+            return false;
+        }
+
+        return true;
+    }
     public void Volver()
     {
         navigationManager.NavigateTo("/Cliente/Index");
