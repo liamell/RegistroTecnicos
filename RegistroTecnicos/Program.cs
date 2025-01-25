@@ -3,7 +3,12 @@ using RegistroTecnicos.Components;
 using RegistroTecnicos.DAL;
 using RegistroTecnicos.Services;
 
+
+Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -13,6 +18,7 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
 builder.Services.AddScoped<TecnicosService>();
+builder.Services.AddScoped<ClientesService>();
 
 builder.Services.AddBlazorBootstrap();
 
