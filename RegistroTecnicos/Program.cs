@@ -3,10 +3,6 @@ using RegistroTecnicos.Components;
 using RegistroTecnicos.DAL;
 using RegistroTecnicos.Services;
 
-
-Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 
