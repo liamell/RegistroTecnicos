@@ -127,7 +127,7 @@
     private string GetTecnicoNombre(int tecnicoId)
     {
         var tecnico = ListaTecnicos.FirstOrDefault(t => t.TecnicoId == tecnicoId);
-        return tecnico != null ? tecnico.Nombres : "Desconocido"; // Mostrar "Desconocido" si no se encuentra
+        return tecnico != null ? tecnico.Nombres : "Desconocido"; 
     }
 
     private async Task Buscar()
