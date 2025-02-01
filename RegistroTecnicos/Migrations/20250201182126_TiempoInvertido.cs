@@ -5,7 +5,7 @@
 namespace RegistroTecnicos.Migrations
 {
     /// <inheritdoc />
-    public partial class somee : Migration
+    public partial class TiempoInvertido : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
