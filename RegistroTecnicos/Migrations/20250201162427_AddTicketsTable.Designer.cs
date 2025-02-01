@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RegistroTecnicos.DAL;
 
@@ -11,9 +12,11 @@ using RegistroTecnicos.DAL;
 namespace RegistroTecnicos.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20250201162427_AddTicketsTable")]
+    partial class AddTicketsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,8 +132,8 @@ namespace RegistroTecnicos.Migrations
                     b.Property<int>("TecnicoId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("TiempoInvertido")
-                        .HasColumnType("time");
+                    b.Property<double>("TiempoInvertido")
+                        .HasColumnType("float");
 
                     b.HasKey("TicketId");
 

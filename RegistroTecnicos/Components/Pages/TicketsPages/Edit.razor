@@ -1,0 +1,154 @@
+﻿@page "/Ticket/Edit/{TicketId:int}"
+@using RegistroTecnicos.Models
+@using RegistroTecnicos.Services
+@inject TicketsService ticketsService
+@inject TecnicosService tecnicosService
+@inject ClientesService clientesService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+
+<PageTitle>Edit</PageTitle>
+<EditForm Model="Ticket" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Ticket</h5>
+            </div>
+
+            <div class="card-body">
+
+                @* TicketId *@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>TicketId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ticket.TicketId" readonly></InputNumber>
+                </div>
+
+                @* Fecha *@
+                <div class="col-6 ms-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Ticket.Fecha"></InputDate>
+                </div>
+
+                @*Prioridad*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Prioridad</strong></label>
+                    <InputText class="form-control" @bind-Value="Ticket.Prioridad"></InputText>
+                    <ValidationMessage For="(()=> Ticket.Prioridad)" />
+                </div>
+
+                @*ClienteId*@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>ClienteId</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Ticket.ClienteId">
+                        <option value="" selected disabled>Elija una opción</option>
+                        @foreach (var cliente in ListaClientes)
+                        {
+                            <option value="@cliente.ClienteId">@($"{cliente.ClienteId} - {cliente.Nombres}")</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Ticket.ClienteId)" />
+                    <p>Tecnico seleccionado: @Ticket.ClienteId</p>
+                </div>
+
+
+                @*Asunto*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Asunto</strong></label>
+                    <InputText class="form-control" @bind-Value="Ticket.Asunto"></InputText>
+                    <ValidationMessage For="@(() => Ticket.Asunto)" />
+                </div>
+
+
+                @*Descripcion*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Descripcion</strong></label>
+                    <InputText class="form-control" @bind-Value="Ticket.Descripcion"></InputText>
+                    <ValidationMessage For="@(() => Ticket.Descripcion)" />
+                </div>
+
+                @* TiempoInvertido *@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>Tiempo Invertido</strong></label>
+                    <div class="d-flex">
+                        <input type="number" class="form-control me-2" @bind="horas" placeholder="Horas" min="0" />
+                        <input type="number" class="form-control me-2" @bind="minutos" placeholder="Minutos" min="0" max="59" />
+                        <input type="number" class="form-control" @bind="segundos" placeholder="Segundos" min="0" max="59" />
+                    </div>
+                    <ValidationMessage For="@(() => Ticket.TiempoInvertido)" />
+                </div>
+
+                @*TecnicoId*@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>TecnicoId</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Ticket.TecnicoId">
+                        <option value="" selected disabled>Elija una opción</option>
+                        @foreach (var tecnico in ListaTecnicos)
+                        {
+                            <option value="@tecnico.TecnicoId">@($"{tecnico.TecnicoId} - {tecnico.Nombres}")</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Ticket.TecnicoId)" />
+                    <p>Tecnico seleccionado: @Ticket.TecnicoId</p>
+                </div>
+                
+            </div>
+
+            @*Footer*@
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+                <button type="submit" class="btn btn-success">Modificar</button>
+            </div>
+        </div>
+
+    </div>
+</EditForm>
+@Mensaje
+
+
+
+@code {
+	[Parameter]
+	public int TicketId { get; set; }
+	public Tickets Ticket { get; set; } = new Tickets();
+	public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
+	public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+	public string Mensaje { get; set; } = string.Empty;
+    private int horas;
+    private int minutos;
+    private int segundos;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Ticket = await ticketsService.Buscar(TicketId);
+		ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+		ListaClientes = await clientesService.Listar(c => c.ClienteId > 0);
+
+
+        horas = Ticket.TiempoInvertido.Hours;
+        minutos = Ticket.TiempoInvertido.Minutes;
+        segundos = Ticket.TiempoInvertido.Seconds;
+	}
+
+	public async Task Modificar()
+    {
+        Ticket.TiempoInvertido = new TimeSpan(horas, minutos, segundos); // Asegúrate de que estás usando segundos
+
+        var Modificar = await ticketsService.Guardar(Ticket);
+        if (Modificar)
+            Mensaje = "Se ha modificado correctamente el Ticket";
+        else
+            Mensaje = "No se ha Modificado correctamente";
+    }
+
+
+	public void Volver()
+	{
+		navigationManager.NavigateTo("/Ticket/Index");
+
+	}
+
+}

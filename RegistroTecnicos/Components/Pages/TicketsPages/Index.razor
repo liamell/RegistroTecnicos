@@ -1,9 +1,12 @@
-﻿@page "/Tecnico/Index"
+﻿@page "/Ticket/Index"
 @using RegistroTecnicos.Models
 @using RegistroTecnicos.Services
+@inject TicketsService ticketsService
+@inject ClientesService clientesService
 @inject TecnicosService tecnicosService
 @inject NavigationManager navigationManager
 @rendermode InteractiveServer
+
 
 @*HTML*@
 
@@ -13,7 +16,7 @@
 
         @*Header*@
         <div class="card-header text-center">
-            <h3><strong>Listado de T&eacute;cnicos</strong></h3>
+            <h3><strong>Listado de Tickets</strong></h3>
         </div>
         @*Body*@
         <div class="card-body">
@@ -36,8 +39,7 @@
                     <InputSelect class="form-select" @bind-Value="Filtro">
                         <option value="" selected disabled>Elija una opci&oacute;n</option>
                         <option value="Id">Id</option>
-                        <option value="Nombre">Nombre</option>
-                        <option value="SueldoHora">SueldoHora</option>
+                        <option value="Cliente">Cliente</option>
                     </InputSelect>
                 </div>
                 @*Busqueda*@
@@ -59,30 +61,41 @@
             <table class="table table-bordered text-center mt-4">
                 <thead>
                     <tr>
-                        <th>T&eacute;cnicoId</th>
-                        <th>Nombre</th>
-                        <th>SueldoHora</th>
+                        <th>TicketId</th>
+                        <th>Fecha</th>
+                        <th>Prioridad</th>
+                        <th>Cliente</th>
+                        <th>Asunto</th>
+                        <th>Descripcion</th>
+                        <th>TiempoInvertido</th>
+                        <th>T&eacute;cnico</th>
                         <th>Editar</th>
                         <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var tecnico in ListaTecnicos)
+                    @foreach (var ticket in ListaTickets)
                     {
                         <tr>
-                            <td>@tecnico.TecnicoId</td>
-                            <td>@tecnico.Nombres</td>
-                            <td>@tecnico.SueldoHora</td>
-                           
+                            <td>@ticket.TicketId</td>
+                            <td>@ticket.Fecha</td>
+                            <td>@ticket.Prioridad</td>
+                            <td>@GetClienteNombre(ticket.ClienteId)</td>
+                            <td>@ticket.Asunto</td>
+                            <td>@ticket.Descripcion</td>
+                            <td>@ticket.TiempoInvertido</td>
+                            <td>@GetTecnicoNombre(ticket.TecnicoId)</td>
+
+
                             @*Pantalla Editar*@
                             <td>
                                 <button type="button" class="btn btn-outline-warning bi bi-pencil"
-                                        @onclick="()=> Editar(tecnico.TecnicoId)"></button>
+                                        @onclick="()=> Editar(ticket.TicketId)"></button>
                             </td>
                             @*Pantalla Eliminar*@
                             <td>
                                 <button type="button" class="btn btn-outline-danger bi bi-trash3"
-                                        @onclick="()=> Eliminar(tecnico.TecnicoId)"></button>
+                                        @onclick="()=> Eliminar(ticket.TicketId)"></button>
                             </td>
                         </tr>
                     }
@@ -92,7 +105,7 @@
         </div>
         @*Footer*@
         <div class="card-footer">
-            <p><strong>Total de T&eacute;cnicos </strong>@ListaTecnicos.Count()</p>
+            <p><strong>Total de Tickets </strong>@ListaTickets.Count()</p>
         </div>
     </div>
 </div>
@@ -100,51 +113,71 @@
 
 
 
+
+
 @code {
+
+    public List<Tickets> ListaTickets { get; set; } = new List<Tickets>();
+    public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
     public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
     public string Filtro { get; set; } = string.Empty;
     public string ValorFiltro { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync() 
+    protected override async Task OnInitializedAsync()
     {
+        ListaTickets = await ticketsService.Listar(t => t.TicketId > 0);
+        ListaClientes = await clientesService.Listar(c => c.ClienteId > 0);
         ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+
+    }
+
+    private string GetTecnicoNombre(int tecnicoId)
+    {
+        var tecnico = ListaTecnicos.FirstOrDefault(t => t.TecnicoId == tecnicoId);
+        return tecnico != null ? tecnico.Nombres : "Desconocido";
+    }
+
+    private string GetClienteNombre(int clienteId)
+    {
+        var cliente = ListaClientes.FirstOrDefault(c => c.ClienteId == clienteId);
+        return cliente != null ? cliente.Nombres : "Desconocido";
     }
 
     private async Task Buscar()
     {
         if (ValorFiltro.Trim() != "")
         {
-            if (Filtro == "Id" && int.TryParse(ValorFiltro, out int tecnicoId))
-                ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId == tecnicoId);
-            else if (Filtro == "Nombre")
-                ListaTecnicos = await tecnicosService.Listar(t => t.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+            if (Filtro == "Id" && int.TryParse(ValorFiltro, out int ticketId))
+                ListaTickets = await ticketsService.Listar(t => t.TicketId == ticketId);
+            else if (Filtro == "Cliente")
+                ListaTickets = await ticketsService.Listar(t => t.Clientes.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+
 
         }
         else
-            ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+            ListaTickets = await ticketsService.Listar(t => t.TicketId > 0);
     }
 
     private async Task Restablecer()
     {
-        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+        ListaTickets = await ticketsService.Listar(t => t.TicketId > 0);
         Filtro = string.Empty;
         ValorFiltro = string.Empty;
     }
 
     public void Crear()
     {
-        navigationManager.NavigateTo("/Tecnico/Create");
+        navigationManager.NavigateTo("/Ticket/Create");
     }
 
     public void Editar(int id)
     {
-        navigationManager.NavigateTo($"/Tecnico/Edit/{id}");
+        navigationManager.NavigateTo($"/Ticket/Edit/{id}");
     }
 
     public void Eliminar(int id)
     {
-        navigationManager.NavigateTo($"/Tecnico/Delete/{id}");
+        navigationManager.NavigateTo($"/Ticket/Delete/{id}");
     }
-
 
 }
