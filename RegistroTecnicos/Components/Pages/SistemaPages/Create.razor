@@ -1,0 +1,90 @@
+﻿@page "/Sistema/Create"
+@using RegistroTecnicos.Models
+@using RegistroTecnicos.Services
+@inject SistemasService sistemasService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Sistema" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Sistema</h5>
+            </div>
+
+            <div class="card-body">
+                @* SistemaId *@
+                <div class="col-7 ms-3">
+                    <label class="form-label"><strong>SistemaId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Sistema.SistemaId" readonly></InputNumber>
+                </div>
+
+
+                @*Descripcion*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Descripcion</strong></label>
+                    <InputText class="form-control" @bind-Value="Sistema.Descripcion"></InputText>
+                    <ValidationMessage For="(()=> Sistema.Descripcion)" />
+                </div>
+
+                @*Complejidad*@
+                <div class="col-3 ms-3">
+                    <label class="form-label"><strong>Complejidad</strong></label>
+                    <InputText class="form-control" @bind-Value="Sistema.Complejidad"></InputText>
+                    <ValidationMessage For="(()=> Sistema.Complejidad)" />
+                </div>
+
+                
+            </div>
+            @*Footer*@
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-primary" @onclick="Volver">Volver</button>
+                <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+
+    </div>
+</EditForm>
+
+
+
+
+
+@Mensaje
+
+@code {
+
+    public Sistemas Sistema { get; set; } = new Sistemas();
+    public List<Sistemas> ListaSistemas { get; set; } = new List<Sistemas>();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaSistemas = await sistemasService.Listar(s => s.SistemaId > 0);
+
+    }
+
+    public async Task Guardar()
+    {
+
+        var crear = await sistemasService.Guardar(Sistema);
+
+        if (crear)
+            Mensaje = "Se ha creado correctamente el Sistema";
+        else
+            Mensaje = "No se ha creado correctamente";
+    }
+
+    
+    public void Volver()
+    {
+        navigationManager.NavigateTo("/Sistema/Index");
+    }
+
+
+
+}
