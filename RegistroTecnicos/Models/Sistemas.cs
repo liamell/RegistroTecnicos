@@ -12,5 +12,6 @@ public class Sistemas
     public string Descripcion{ get; set; }
 
     [Required(ErrorMessage = "Campo Obligatorio")]
-    public string Complejidad { get; set; }
+    [Range(1, 100)]
+    public double Complejidad { get; set; }
 }

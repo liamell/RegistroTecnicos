@@ -31,14 +31,13 @@
                     <ValidationMessage For="(()=> Sistema.Descripcion)" />
                 </div>
 
-                @*Complejidad*@
+                @* Complejidad *@
                 <div class="col-3 ms-3">
                     <label class="form-label"><strong>Complejidad</strong></label>
-                    <InputText class="form-control" @bind-Value="Sistema.Complejidad"></InputText>
-                    <ValidationMessage For="(()=> Sistema.Complejidad)" />
+                    <InputNumber class="form-control" @bind-Value="Sistema.Complejidad"></InputNumber>
+                    <ValidationMessage For="(() => Sistema.Complejidad)" />
                 </div>
 
-                
             </div>
             @*Footer*@
             <div class="card-footer text-center">
